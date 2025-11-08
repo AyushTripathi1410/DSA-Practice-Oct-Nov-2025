@@ -1,37 +1,32 @@
 class Solution {
   public:
     vector<int> getLIS(vector<int>& arr) {
+        // Code here
         int n = arr.size();
-        vector<int> tail;       
-        vector<int> tailIndex;        
-        vector<int> parent(n, -1);        
-
-        for (int i = 0; i < n; i++) {
-
-            int x = arr[i];
-            int pos = lower_bound(tail.begin(), tail.end(), x) - tail.begin();
-            if (pos == tail.size()) {
-                tail.push_back(x);
-                tailIndex.push_back(i);
+        vector<int>par(n), dp(n,1);
+        for(int i=0;i<n;i++) par[i] = i;
+        
+        int ans = 1, st = 0;
+        
+        for(int i=n-1;i>=0;i--){
+            for(int j=i-1;j>=0;j--){
+                if(arr[i]>arr[j] && dp[j] <= 1 + dp[i]){
+                    dp[j] = 1 + dp[i];
+                    par[j] = i;
+                }
+                if(dp[j]>=ans){
+                    ans = dp[j], st = j;
+                }
             }
-            else {
-                tail[pos] = x;
-                tailIndex[pos] = i;
-            }
-
-            if (pos != 0)
-                parent[i] = tailIndex[pos - 1];
         }
-
-        vector<int> lis;
-        int lastIndex = tailIndex.back();
-
-        while (lastIndex != -1) {
-            lis.push_back(arr[lastIndex]);
-            lastIndex = parent[lastIndex];
+        
+        vector<int> temp;
+        while(par[st]!=st) {
+            temp.push_back(arr[st]);
+            st = par[st];
         }
-
-        reverse(lis.begin(), lis.end());
-        return lis;
+        temp.push_back(arr[st]);
+        
+        return temp;
     }
 };
